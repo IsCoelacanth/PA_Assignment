@@ -6,16 +6,24 @@ import threading as th
 def apply_threshold(value):
         return 255 * floor(value/128)
 
-def fs(img, lin = None, mode = 's'):
+def fs(img, lin = None, mode = 's', event=None):
     x = img.shape[0]
     y = img.shape[1]
     if mode == 'p':
-        lck = th.Lock()
-        lck.acquire()
-        # if delay is not None:
-        #     sleep(float(delay)/1000)
-        
+        # print(event)
+        if lin > 0:
+            event[lin].wait()
+        # print ("Process {} started".format(lin))
+        # lck = th.Lock()
+        # lck.acquire()
         for j in range (y - 1):
+            if j == 3:
+                if lin == 0 :
+                    event[1].set()
+                else:
+                    # print ('set event ',lin)
+                    if lin + 1 < x - 2:
+                        event[lin+1].set()
             old_px = img[lin][j]
             new_px = apply_threshold(old_px)
             err = old_px - new_px
@@ -25,7 +33,7 @@ def fs(img, lin = None, mode = 's'):
             img[lin + 1][j - 1] += (err * 3)
             img[lin    ][j    ] += (err * 5)
             img[lin + 1][j + 1] += (err * 1)
-        lck.release()
+        # lck.release()
     else :      
         for i in range(x-1):
             for j in range(y-1):
