@@ -23,9 +23,9 @@ def main():
     p_x = []
     p_y = []
 
-    i = 0.25 
+    i = 1 
 
-    while ( i <= 16):
+    while ( i <= 1):
         s_im = cv2.resize(img, (0,0), fx= 1/i, fy = 1/i)
         now = time.time()
         ordered(s_im, T)
@@ -34,13 +34,14 @@ def main():
         s_y.append(en-now)
         i *= 2
         if i == 2:
+            cv2.imwrite('../images/ordered_{}.png'.format(1/i), cv2.bitwise_not(s_im))
             plt.imshow(s_im, cmap='binary')
             plt.show()
     # print(s_x)
     # print(s_y)
 
-    i = 0.25
-    while(i <= 16):
+    i = 1
+    while(i <= 1):
         s_im = cv2.resize(img, (0,0), fx= 1/i, fy = 1/i)
         jobs = []
         for j in range(s_im.shape[0]):
@@ -55,6 +56,7 @@ def main():
         p_y.append((en-now)/(len(jobs)))
         i *= 2
         if i == 2:
+            cv2.imwrite('../images/ordered_parr_{}.png'.format(1/i), cv2.bitwise_not(s_im))
             plt.imshow(s_im, cmap='binary')
             plt.show()
 

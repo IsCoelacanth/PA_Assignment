@@ -17,9 +17,7 @@ def blocked_fs(img, evt):
         evt.wait()
     avg_1 = np.mean(img[0])
     avg_2 = np.mean(img[-1])
-    for i in range(len(img[0])):
-        img[0][i] = 0 if img[0][i] < avg_1 else 255
-    for i in range(1, img.shape[0]-1):
+    for i in range(0, img.shape[0]-1):
         for j in range(img.shape[1] - 1):
             old_px = img[i][j]
             new_px = apply_threshold(old_px)
@@ -30,8 +28,6 @@ def blocked_fs(img, evt):
             img[i + 1][j - 1] += (err * 3)
             img[i    ][j    ] += (err * 5)
             img[i + 1][j + 1] += (err * 1)
-    for i in range(len(img[-1])):
-        img[-1][i] = 0 if img[-1][i] < avg_2 else 255
 
 def main():
     
@@ -40,7 +36,7 @@ def main():
     p_x = []
     p_y = []
 
-    skl = 0.0625
+    skl = 1
     iimg = cv2.imread('../images/image.jpg', 0)
     iimg = cv2.bitwise_not(iimg)
 
@@ -53,7 +49,7 @@ def main():
         output = img.copy()
         step = img.shape[0] // 16
         for i in range(0, output.shape[0]-1, step):
-            processes.append(th.Thread(target=blocked_fs, args = (output[i : i+step], event)))
+            processes.append(th.Thread(target=blocked_fs, args = (output[i : i+step+1], event)))
 
         for i in processes:
             i.start()
@@ -66,9 +62,9 @@ def main():
         p_y.append((T.time() - now) / (len(processes)))
         print('Time taken parallel : {}'.format((T.time() - now) / (len(processes))))
         # if skl == 1:
-        #     cv2.imwrite('../images/doggo_parallel_with_16_procs.png', cv2.bitwise_not(output))
-        # plt.imshow(output, cmap='Greys')
-        # plt.show()
+        cv2.imwrite('../images/doggo_parallel_with_16_procs.png', cv2.bitwise_not(output))
+        plt.imshow(output, cmap='Greys')
+        plt.show()
 
         now = T.time()
         img_fs = img.copy()
